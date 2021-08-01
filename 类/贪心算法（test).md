@@ -48,4 +48,4 @@ def minPartitions(self, n: str) -> int:
 ```
 这道题的思路也很简单，就是看一下这个数里面单个数最大值。
 
-
+This version is git test
