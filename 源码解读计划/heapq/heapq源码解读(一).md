@@ -112,3 +112,33 @@ Traceback (most recent call last):
     heapq.heapreplace(empty,1)
 IndexError: index out of range
 ```
+
+### merge(*iterables, key=None, reverse=False)
+
+
+### nlargest(n,iterable,key=None)
+返回数据集中最大的n个元素组成的列表。
+
+Example:
+```python
+print("nlargest:",heapq.nlargest(3,heap))
+```
+
+Result:
+```
+nlargest: [5, 4, 3]
+```
+
+
+### nsmallest(n,iterable,key=None)
+返回数据集中最大的n个元素组成的列表。
+
+Example:
+```python
+print("nsmallest:",heapq.nsmallest(3,heap))
+```
+
+Result;
+```
+nsmallest: [1, 2, 3]
+```
