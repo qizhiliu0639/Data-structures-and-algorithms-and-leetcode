@@ -1,5 +1,6 @@
 # Python heapq源码解读计划(一)
 
+本文是解读heapq源码的初始章节，主要目的是介绍heapq这个库的基本使用方法。
 
 ## heapq的介绍与基本操作
 （原文地址：https://docs.python.org/3/library/heapq.html#basic-examples）
@@ -112,9 +113,6 @@ Traceback (most recent call last):
     heapq.heapreplace(empty,1)
 IndexError: index out of range
 ```
-
-### merge(*iterables, key=None, reverse=False)
-
 
 ### nlargest(n,iterable,key=None)
 返回数据集中最大的n个元素组成的列表。
