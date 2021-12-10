@@ -1,4 +1,4 @@
-# Python heapq源码解读计划(一)
+# Python heapq源码解读计划(二)
 
 本文为解读heapq部分的第二节，主要是探索heapq中的heapify()函数具体是如何实现的。
 
