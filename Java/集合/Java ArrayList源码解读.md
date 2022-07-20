@@ -114,7 +114,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 ```
 
-###
+### **ensureCapacityInternal方法**
 
 ```java
 private void ensureCapacityInternal(int minCapacity) {
@@ -124,50 +124,49 @@ private void ensureCapacityInternal(int minCapacity) {
     }
 ```
 
-## ArrayList的扩容机制
+这里面又涉及了两个方法： `ensureExplicitCapacity`和`calculateCapacity`方法
 
+
+### **calculateCapacity方法**
+
+`calculateCapacity`方法有两个输入参数，一个是Object数列，一个是最小容量。当当前的数列是空数列，那么就返回默认容量和最小容量中的最大值。
+否则就返回最小的容量。
 ```java
-    /**
-     * Increases the capacity of this <tt>ArrayList</tt> instance, if
-     * necessary, to ensure that it can hold at least the number of elements
-     * specified by the minimum capacity argument.
-     *
-     * @param   minCapacity   the desired minimum capacity
-     */
-    public void ensureCapacity(int minCapacity) {
-        int minExpand = (elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA)
-            // any size if not default element table
-            ? 0
-            // larger than default for default empty table. It's already
-            // supposed to be at default size.
-            : DEFAULT_CAPACITY;
-
-        if (minCapacity > minExpand) {
-            ensureExplicitCapacity(minCapacity);
-        }
-    }
-
-    private static int calculateCapacity(Object[] elementData, int minCapacity) {
+private static int calculateCapacity(Object[] elementData, int minCapacity) {
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             return Math.max(DEFAULT_CAPACITY, minCapacity);
         }
         return minCapacity;
     }
+```
 
-    private void ensureCapacityInternal(int minCapacity) {
-        ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
-    }
+## **ensureExplicitCapacity方法**
 
-    private void ensureExplicitCapacity(int minCapacity) {
+```java
+private void ensureExplicitCapacity(int minCapacity) {
         modCount++;
 
         // overflow-conscious code
         if (minCapacity - elementData.length > 0)
             grow(minCapacity);
     }
+```
 
+我们来仔细分析一下：
+
+* 当我们要 add 进第 1 个元素到 ArrayList 时，elementData.length 为 0 （因为还是一个空的 list），因为执行了 ensureCapacityInternal() 方法 ，所以 minCapacity 此时为 10。此时，minCapacity - elementData.length > 0成立，所以会进入 grow(minCapacity) 方法。
+* 当 add 第 2 个元素时，minCapacity 为 2，此时 e lementData.length(容量)在添加第一个元素后扩容成 10 了。此时，minCapacity - elementData.length > 0 不成立，所以不会进入 （执行）grow(minCapacity) 方法。
+* 添加第 3、4···到第 10 个元素时，依然不会执行 grow 方法，数组容量都为 10。
+直到添加第 11 个元素，minCapacity(为 11)比 elementData.length（为 10）要大。进入 grow 方法进行扩容。
+
+
+
+## **grow方法**
+
+```java
 
     /**
+     * 要分配的最大数组大小
      * The maximum size of array to allocate.
      * Some VMs reserve some header words in an array.
      * Attempts to allocate larger arrays may result in
@@ -183,10 +182,16 @@ private void ensureCapacityInternal(int minCapacity) {
      */
     private void grow(int minCapacity) {
         // overflow-conscious code
+        // oldCapacity为旧容量，newCapacity为新容量
         int oldCapacity = elementData.length;
+        //将oldCapacity 右移一位，其效果相当于oldCapacity /2，
+        //我们知道位运算的速度远远快于整除运算，整句运算式的结果就是将新容量更新为旧容量的1.5倍，
         int newCapacity = oldCapacity + (oldCapacity >> 1);
+        //然后检查新容量是否大于最小需要容量，若还是小于最小需要容量，那么就把最小需要容量当作数组的新容量，
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity;
+        // 如果新容量大于 MAX_ARRAY_SIZE,进入(执行) `hugeCapacity()` 方法来比较 minCapacity 和 MAX_ARRAY_SIZE，
+       //如果minCapacity大于最大容量，则新容量则为`Integer.MAX_VALUE`，否则，新容量大小则为 MAX_ARRAY_SIZE 即为 `Integer.MAX_VALUE - 8`。
         if (newCapacity - MAX_ARRAY_SIZE > 0)
             newCapacity = hugeCapacity(minCapacity);
         // minCapacity is usually close to size, so this is a win:
