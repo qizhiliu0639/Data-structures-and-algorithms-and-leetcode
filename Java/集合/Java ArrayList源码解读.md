@@ -197,6 +197,26 @@ private void ensureExplicitCapacity(int minCapacity) {
         // minCapacity is usually close to size, so this is a win:
         elementData = Arrays.copyOf(elementData, newCapacity);
     }
+```
+
+我们再来通过例子探究一下grow() 方法 ：
+
+* 当 add 第 1 个元素时，oldCapacity 为 0，经比较后第一个 if 判断成立，newCapacity = minCapacity(为 10)。但是第二个 if 判断不会成立，即 newCapacity 不比 MAX_ARRAY_SIZE 大，则不会进入 hugeCapacity 方法。数组容量为 10，add 方法中 return true,size 增为 1。
+* 当 add 第 11 个元素进入 grow 方法时，newCapacity 为 15，比 minCapacity（为 11）大，第一个 if 判断不成立。新容量没有大于数组最大 size，不会进入 hugeCapacity 方法。数组容量扩为 15，add 方法中 return true,size 增为 11。
+以此类推······
+
+这里补充一点比较重要，但是容易被忽视掉的知识点：
+
+* java 中的 length属性是针对数组说的,比如说你声明了一个数组,想知道这个数组的长度则用到了 length 这个属性.
+* java 中的 length() 方法是针对字符串说的,如果想看这个字符串的长度则用到 length() 这个方法.
+* java 中的 size() 方法是针对泛型集合说的,如果想看这个泛型有多少个元素,就调用此方法来查看!
+#
+
+## **hugeCapacity方法**
+
+从上面`grow()`方法源码我们知道： 如果新容量大于`MAX_ARRAY_SIZE`,进入(执行) `hugeCapacity()`方法来比较`minCapacity`和`MAX_ARRAY_SIZE`，如果`minCapacity`大于最大容量，则新容量则为Integer.MAX_VALUE，否则，新容量大小则为`MAX_ARRAY_SIZE`即为 `Integer.MAX_VALUE - 8`。
+
+```java
 
     private static int hugeCapacity(int minCapacity) {
         if (minCapacity < 0) // overflow
